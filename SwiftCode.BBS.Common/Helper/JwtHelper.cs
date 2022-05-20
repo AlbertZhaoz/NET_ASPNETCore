@@ -1,11 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SwiftCode.BBS.Common.Helper
 {
@@ -57,6 +53,52 @@ namespace SwiftCode.BBS.Common.Helper
             var encodedJwt = jwtHandler.WriteToken(jwt);
 
             return encodedJwt;
+        }
+
+        /// <summary>
+        /// 解析前校验secretkey
+        /// </summary>
+        /// <param name="jwtStr"></param>
+        /// <returns></returns>
+        public static TokenModelJwt SerializeJwtBySecret(string jwtStr)
+        {
+            var jwtHandler = new JwtSecurityTokenHandler();
+            TokenModelJwt tokenModelJwt = new TokenModelJwt();
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AppSettingsHelper.app(new string[] { "Audience", "Secret" })));
+            var tokenValidationParameters = new TokenValidationParameters();
+            // 只验证SecretKey 不验证Audience和Issuer
+            tokenValidationParameters.IssuerSigningKey = secretKey;
+            tokenValidationParameters.ValidateAudience = false;
+            tokenValidationParameters.ValidateIssuer = false;
+
+            var jwtStrIsOk = true;
+
+            try
+            {
+                jwtHandler.ValidateToken(jwtStr, tokenValidationParameters, out SecurityToken securityToken);
+            }
+            catch (Exception)
+            {
+                jwtStrIsOk = false;
+            }
+            
+            // token校验
+            if (!string.IsNullOrEmpty(jwtStr) && jwtHandler.CanReadToken(jwtStr)&&jwtStrIsOk)
+            {
+
+                JwtSecurityToken jwtToken = jwtHandler.ReadJwtToken(jwtStr);
+
+                object role;
+
+                jwtToken.Payload.TryGetValue(ClaimTypes.Role, out role);
+
+                tokenModelJwt = new TokenModelJwt
+                {
+                    Uid = Convert.ToInt64(jwtToken.Id),
+                    Role = role == null ? "" : role.ToString()
+                };
+            }
+            return tokenModelJwt;
         }
 
         /// <summary>

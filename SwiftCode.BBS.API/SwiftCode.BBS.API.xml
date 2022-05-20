@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SwiftCode.BBS.API</name>
+    </assembly>
+    <members>
+        <member name="T:SwiftCode.BBS.API.Controllers.WeatherForecastController">
+            <summary>
+            Weather forecast
+            </summary>
+        </member>
+        <member name="M:SwiftCode.BBS.API.Controllers.WeatherForecastController.Get">
+            <summary>
+            Get Random Forecast
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

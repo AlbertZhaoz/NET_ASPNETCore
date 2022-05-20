@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SwiftCode.BBS.Common.Helper;
+using System.Security.Claims;
 
 namespace SwiftCode.BBS.API.Controllers
 {
@@ -17,7 +19,7 @@ namespace SwiftCode.BBS.API.Controllers
         /// <param name="role"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<object> GetJwtAdminStr(int uid,string role,string work)
+        public async Task<object> GetJwtStr(int uid,string role,string work)
         {
             // 将用户id和角色名，作为单独的自定义变量封装进 token 字符串中。
             TokenModelJwt tokenModel = new TokenModelJwt { Uid = uid, Role = role ,Work=work};
@@ -31,7 +33,20 @@ namespace SwiftCode.BBS.API.Controllers
         }
 
         /// <summary>
-        /// GetJwtTokenModel
+        /// 请求的用户名
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Authorize(Roles ="Admin")]
+        public ActionResult<string> GetUserRole()
+        {
+            // 根据用户角色名来获取第一个角色信息
+            var claims = this.User.FindFirst(ClaimTypes.Role)!;
+            return $"OK {claims.Value}";
+        }
+
+        /// <summary>
+        /// 解析JWT
         /// </summary>
         /// <param name="jwtStr"></param>
         /// <returns></returns>
@@ -42,7 +57,7 @@ namespace SwiftCode.BBS.API.Controllers
         }
 
         /// <summary>
-        /// GetJwtTokenModel
+        /// 根据Key解析
         /// </summary>
         /// <param name="jwtStr"></param>
         /// <returns></returns>

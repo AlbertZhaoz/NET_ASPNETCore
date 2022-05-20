@@ -18,6 +18,7 @@ namespace SwiftCode.BBS.Common.Helper
             string iss = AppSettingsHelper.app(new string[] { "Audience", "Issuer" });
             string aud = AppSettingsHelper.app(new string[] { "Audience", "Audience" });
             string secret = AppSettingsHelper.app(new string[] { "Audience", "Secret" });
+            double expireTime = double.Parse(AppSettingsHelper.app(new string[] { "Audience", "ExpireSeconds" }));
 
             var claims = new List<Claim>
                 {
@@ -30,8 +31,8 @@ namespace SwiftCode.BBS.Common.Helper
                 new Claim(JwtRegisteredClaimNames.Iat, $"{new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()}"),
                 new Claim(JwtRegisteredClaimNames.Nbf,$"{new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()}") ,
                 //这个就是过期时间，目前是过期1000秒，可自定义，注意JWT有自己的缓冲过期时间
-                new Claim (JwtRegisteredClaimNames.Exp,$"{new DateTimeOffset(DateTime.Now.AddSeconds(1000)).ToUnixTimeSeconds()}"),
-                new Claim(ClaimTypes.Expiration, DateTime.Now.AddSeconds(1000).ToString()),
+                new Claim (JwtRegisteredClaimNames.Exp,$"{new DateTimeOffset(DateTime.Now.AddSeconds(expireTime)).ToUnixTimeSeconds()}"),
+                new Claim(ClaimTypes.Expiration, DateTime.Now.AddSeconds(expireTime).ToString()),
                 new Claim(JwtRegisteredClaimNames.Iss,iss),
                 new Claim(JwtRegisteredClaimNames.Aud,aud),
 
